@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>未来商城 · Future Shop</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900">
+<header class="bg-white border-b sticky top-0 z-10">
+  <div class="max-w-5xl mx-auto px-4 py-3 flex items-center gap-4">
+    <div class="text-xl font-bold text-indigo-600">🛍 未来商城</div>
+    <nav class="flex gap-4 text-sm text-gray-600">
+      <a href="/category/digital" class="hover:text-indigo-600">数码</a>
+      <a href="/category/home" class="hover:text-indigo-600">家居</a>
+      <a href="/cart" class="hover:text-indigo-600">购物车</a>
+    </nav>
+    <div class="ml-auto text-sm text-gray-400">future-shop.magic</div>
+  </div>
+</header>
+
+<main class="max-w-5xl mx-auto px-4 py-8">
+  <section class="mb-8 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl p-8 text-white">
+    <h1 class="text-2xl font-bold mb-2">2049 未来生活节</h1>
+    <p class="opacity-90">全站数码好物低至 5 折，AI 帮你挑、无人机当天达。</p>
+  </section>
+
+  <h2 class="text-lg font-bold mb-4">热销推荐</h2>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+    <div class="bg-white rounded-2xl overflow-hidden shadow hover:shadow-lg transition">
+      <div class="h-36 bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-5xl">⌚</div>
+      <div class="p-4">
+        <div class="font-semibold">星环手表 Pro</div>
+        <div class="text-sm text-gray-500 mt-1">全息投影 · 14 天续航</div>
+        <div class="mt-3 flex items-center justify-between">
+          <span class="text-red-500 font-bold">¥1,999</span>
+          <button data-magic-nav data-magic-url="/product/watch" class="bg-indigo-600 text-white text-sm px-4 py-1.5 rounded-full hover:bg-indigo-700">查看详情</button>
+        </div>
+      </div>
+    </div>
+    <div class="bg-white rounded-2xl overflow-hidden shadow hover:shadow-lg transition">
+      <div class="h-36 bg-gradient-to-br from-emerald-400 to-teal-600 flex items-center justify-center text-5xl">🎧</div>
+      <div class="p-4">
+        <div class="font-semibold">静噪耳机 Air3</div>
+        <div class="text-sm text-gray-500 mt-1">主动降噪 · 空间音频</div>
+        <div class="mt-3 flex items-center justify-between">
+          <span class="text-red-500 font-bold">¥899</span>
+          <button data-magic-nav data-magic-url="/product/headphone" class="bg-indigo-600 text-white text-sm px-4 py-1.5 rounded-full hover:bg-indigo-700">查看详情</button>
+        </div>
+      </div>
+    </div>
+    <div class="bg-white rounded-2xl overflow-hidden shadow hover:shadow-lg transition">
+      <div class="h-36 bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center text-5xl">🤖</div>
+      <div class="p-4">
+        <div class="font-semibold">家务机器人 Mini</div>
+        <div class="text-sm text-gray-500 mt-1">扫拖一体 · 语音管家</div>
+        <div class="mt-3 flex items-center justify-between">
+          <span class="text-red-500 font-bold">¥3,499</span>
+          <button data-magic-nav data-magic-url="/product/robot" class="bg-indigo-600 text-white text-sm px-4 py-1.5 rounded-full hover:bg-indigo-700">查看详情</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 本地交互示例：无需服务端的展开/收起 -->
+  <section class="mt-10 bg-white rounded-2xl p-6 shadow">
+    <button id="coupon-btn" class="text-left w-full flex items-center justify-between">
+      <span class="font-semibold">🎁 领取优惠券（点击展开，本地交互演示）</span>
+      <span id="coupon-arrow" class="transition-transform">▾</span>
+    </button>
+    <div id="coupon-panel" class="hidden mt-4 grid grid-cols-3 gap-3">
+      <div class="border border-dashed border-red-300 rounded-xl p-3 text-center text-red-500">¥100<br><span class="text-xs text-gray-400">满 1000 可用</span></div>
+      <div class="border border-dashed border-red-300 rounded-xl p-3 text-center text-red-500">¥50<br><span class="text-xs text-gray-400">满 500 可用</span></div>
+      <div class="border border-dashed border-red-300 rounded-xl p-3 text-center text-red-500">¥10<br><span class="text-xs text-gray-400">无门槛</span></div>
+    </div>
+  </section>
+</main>
+
+<footer class="border-t mt-12 py-6 text-center text-xs text-gray-400">
+  本页面由 Magic Browser 实时生成 · future-shop.magic
+</footer>
+
+<script>
+  // 轻量交互：优惠券面板展开/收起（纯本地，不触发导航）。
+  document.getElementById('coupon-btn').addEventListener('click', function () {
+    var panel = document.getElementById('coupon-panel');
+    var arrow = document.getElementById('coupon-arrow');
+    var hidden = panel.classList.toggle('hidden');
+    arrow.style.transform = hidden ? '' : 'rotate(180deg)';
+  });
+</script>
+</body>
+</html>

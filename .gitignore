@@ -1,0 +1,27 @@
+# Binaries (root level only)
+/magic-browser
+/mockllm
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test artifacts
+*.test
+*.out
+
+# Runtime data & secrets
+# data/ contains runtime-generated config.json (with keys/passwords), secret.key, pages.jsonl
+data/*
+!data/README.md
+!data/.gitkeep
+*.key
+*.jsonl
+
+# IDE & OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*~

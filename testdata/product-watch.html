@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>星环手表 Pro · 未来商城</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900">
+<header class="bg-white border-b sticky top-0 z-10">
+  <div class="max-w-5xl mx-auto px-4 py-3 flex items-center gap-4">
+    <a href="/" class="text-xl font-bold text-indigo-600">🛍 未来商城</a>
+    <nav class="flex gap-4 text-sm text-gray-600">
+      <a href="/category/digital">数码</a>
+      <a href="/cart">购物车</a>
+    </nav>
+  </div>
+</header>
+
+<main class="max-w-5xl mx-auto px-4 py-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+  <div class="bg-gradient-to-br from-sky-400 to-blue-600 rounded-2xl h-80 flex items-center justify-center text-8xl">⌚</div>
+  <div>
+    <h1 class="text-2xl font-bold">星环手表 Pro</h1>
+    <div class="text-sm text-gray-500 mt-1">全息投影 · 14 天续航 · 100m 防水</div>
+    <div class="text-3xl text-red-500 font-bold mt-4">¥1,999 <span class="text-sm text-gray-400 line-through">¥2,499</span></div>
+
+    <!-- 本地交互：规格切换 Tab -->
+    <div class="mt-6">
+      <div class="flex gap-2 text-sm">
+        <button class="tab-btn px-4 py-1.5 rounded-full border" data-tab="overview">概述</button>
+        <button class="tab-btn px-4 py-1.5 rounded-full border" data-tab="spec">参数</button>
+        <button class="tab-btn px-4 py-1.5 rounded-full border" data-tab="review">评价</button>
+      </div>
+      <div id="tab-overview" class="tab-panel mt-3 text-sm text-gray-600 leading-7">腕上全息投影，抬腕即见 7 英寸虚拟屏。健康传感器全天候守护，卫星通信永不失联。</div>
+      <div id="tab-spec" class="tab-panel hidden mt-3 text-sm text-gray-600 leading-7">· 屏幕：2.1 英寸 LTPO<br>· 电池：14 天典型使用<br>· 重量：38g 钛合金<br>· 防水：100m / IPX8</div>
+      <div id="tab-review" class="tab-panel hidden mt-3 text-sm text-gray-600 leading-7">★ 4.9（12,847 条评价）<br>"投影效果超出预期，通勤看导航太方便了。" —— 已验证购买者</div>
+    </div>
+
+    <!-- 深度交互：表单提交进入结算 -->
+    <form data-magic-form action="/checkout" class="mt-8 bg-white rounded-2xl p-5 shadow space-y-4">
+      <div class="flex items-center gap-4 text-sm">
+        <label>颜色</label>
+        <select name="color" class="border rounded-lg px-3 py-1.5">
+          <option value="titan">钛银</option>
+          <option value="black">曜黑</option>
+          <option value="blue">深蓝</option>
+        </select>
+        <label class="ml-4">数量</label>
+        <input type="number" name="qty" value="1" min="1" max="9" class="border rounded-lg px-3 py-1.5 w-20">
+      </div>
+      <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl">立即购买</button>
+    </form>
+  </div>
+</main>
+
+<footer class="border-t mt-12 py-6 text-center text-xs text-gray-400">
+  本页面由 Magic Browser 实时生成 · future-shop.magic
+</footer>
+
+<script>
+  // 本地 Tab 切换。
+  var btns = document.querySelectorAll('.tab-btn');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].addEventListener('click', function () {
+      var panels = document.querySelectorAll('.tab-panel');
+      for (var j = 0; j < panels.length; j++) panels[j].classList.add('hidden');
+      document.getElementById('tab-' + this.getAttribute('data-tab')).classList.remove('hidden');
+      for (var k = 0; k < btns.length; k++) {
+        btns[k].className = 'tab-btn px-4 py-1.5 rounded-full border';
+      }
+      this.className = 'tab-btn px-4 py-1.5 rounded-full border bg-indigo-600 text-white';
+    });
+  }
+</script>
+</body>
+</html>

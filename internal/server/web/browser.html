@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Magic Browser</title>
+<link rel="stylesheet" href="/browser.css">
+</head>
+<body>
+<!-- 访客密码门 -->
+<div id="gate" class="gate hidden">
+  <div class="gate-card">
+    <div class="gate-logo">✨</div>
+    <h1>Magic Browser</h1>
+    <p class="gate-sub">AI 原生浏览器 · 每个页面都为你即时生成</p>
+    <form id="gate-form">
+      <input type="password" id="gate-password" placeholder="请输入访问密码" autocomplete="current-password">
+      <button type="submit">进 入</button>
+      <p id="gate-error" class="gate-error hidden">访问密码不正确</p>
+    </form>
+  </div>
+</div>
+
+<!-- 浏览器外壳 -->
+<div id="chrome" class="hidden">
+  <header class="titlebar">
+    <div class="traffic-lights"><span></span><span></span><span></span></div>
+    <div class="titlebar-title" id="tab-title">新标签页</div>
+    <button type="button" id="btn-fullscreen" class="titlebar-btn" title="全屏 (F11)">⛶</button>
+    <a class="titlebar-admin" href="/admin" target="_blank" title="管理后台">⚙</a>
+  </header>
+  <form id="nav-form" class="navbar">
+    <button type="button" id="btn-back" class="nav-btn" title="后退" disabled>‹</button>
+    <button type="button" id="btn-fwd" class="nav-btn" title="前进" disabled>›</button>
+    <button type="button" id="btn-reload" class="nav-btn" title="重新生成" disabled>⟳</button>
+    <button type="button" id="btn-share" class="nav-btn" title="分享当前页" disabled>⇪</button>
+    <div class="url-wrap">
+      <span class="url-scheme">✨</span>
+      <input id="url-input" type="text" placeholder="输入任意网址，例如 future-shop.magic" spellcheck="false" autocomplete="off">
+    </div>
+    <button type="submit" id="btn-go" class="nav-go">前往</button>
+  </form>
+  <main id="viewport">
+    <div id="start-page">
+      <div class="start-inner">
+        <div class="start-logo">✨</div>
+        <h1>Magic Browser</h1>
+        <p>这里没有真实的互联网——你输入的每一个网址，都由 AI 实时生成整个页面。</p>
+        <div class="start-samples">
+          <button data-url="future-shop.magic">🛍 future-shop.magic</button>
+          <button data-url="news.today.magic">📰 news.today.magic</button>
+          <button data-url="weather.sky.magic">🌤 weather.sky.magic</button>
+          <button data-url="game.arcade.magic">🎮 game.arcade.magic</button>
+        </div>
+      </div>
+    </div>
+    <div id="loading-mask" class="hidden">
+      <div class="mask-inner">
+        <div class="spinner"></div>
+        <p id="loading-text">页面加载中…</p>
+        <button id="btn-cancel" type="button">取消</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script src="/browser.js"></script>
+</body>
+</html>

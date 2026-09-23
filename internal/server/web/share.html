@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Magic Browser · 页面快照</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+.hidden { display: none !important; }
+:root { --accent: #6d5dfc; --text: #1f2329; --dim: #646a73; --line: #e2e4ea; }
+body { font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; height: 100vh; display: flex; flex-direction: column; background: #f5f6f8; color: var(--text); }
+
+/* 密码门 */
+#gate { position: fixed; inset: 0; z-index: 100; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+.gate-card { width: min(380px, 90vw); padding: 40px 36px; text-align: center; background: rgba(255,255,255,.96); border-radius: 20px; box-shadow: 0 24px 60px rgba(0,0,0,.25); }
+.gate-card h1 { font-size: 20px; margin: 10px 0 6px; }
+.gate-sub { font-size: 13px; color: var(--dim); margin-bottom: 24px; }
+#gate input { width: 100%; padding: 12px 14px; font-size: 15px; border: 1px solid var(--line); border-radius: 10px; outline: none; text-align: center; }
+#gate input:focus { border-color: var(--accent); }
+#gate button { width: 100%; margin-top: 14px; padding: 12px; font-size: 15px; color: #fff; background: var(--accent); border: none; border-radius: 10px; cursor: pointer; }
+#gate-error { margin-top: 10px; font-size: 13px; color: #e54d42; }
+
+/* 快照视图 */
+#view { display: flex; flex-direction: column; height: 100vh; }
+.share-bar { display: flex; align-items: center; gap: 10px; padding: 10px 16px; background: #fff; border-bottom: 1px solid var(--line); font-size: 13px; }
+.share-bar .url { font-weight: 600; max-width: 40vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.share-bar .time { color: var(--dim); }
+.share-bar .badge { padding: 2px 8px; font-size: 11px; color: var(--accent); background: #efeaff; border-radius: 999px; }
+#btn-continue { margin-left: auto; padding: 7px 16px; font-size: 13px; color: #fff; background: var(--accent); border: none; border-radius: 999px; cursor: pointer; text-decoration: none; white-space: nowrap; }
+#btn-continue:hover { filter: brightness(1.06); }
+#frame { flex: 1; width: 100%; border: none; background: #fff; }
+
+/* 不存在 */
+#missing { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--dim); font-size: 14px; }
+</style>
+</head>
+<body>
+
+<div id="gate" class="hidden">
+  <div class="gate-card">
+    <div style="font-size:44px">✨</div>
+    <h1>Magic Browser</h1>
+    <p class="gate-sub">这是一个分享的页面快照 · 输入访问密码查看</p>
+    <form id="gate-form">
+      <input type="password" id="gate-password" placeholder="访问密码" autocomplete="current-password">
+      <button type="submit">查 看</button>
+      <p id="gate-error" class="hidden"></p>
+    </form>
+  </div>
+</div>
+
+<div id="view" class="hidden">
+  <header class="share-bar">
+    <span class="badge">快照</span>
+    <span class="url" id="snap-url"></span>
+    <span class="time" id="snap-time"></span>
+    <a id="btn-continue" href="#">继续浏览 →</a>
+  </header>
+  <iframe id="frame" sandbox="allow-scripts allow-forms" referrerpolicy="no-referrer"></iframe>
+</div>
+
+<div id="missing" class="hidden">快照不存在或已被删除</div>
+
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var id = location.pathname.split('/').pop() || '';
+
+  function show(which) {
+    ['gate', 'view', 'missing'].forEach(function (n) { $(n).classList.add('hidden'); });
+    $(which).classList.remove('hidden');
+  }
+
+  $('btn-continue').href = '/?resume=' + encodeURIComponent(id);
+
+  function fmtTime(unix) {
+    var d = new Date(unix * 1000);
+    function p(n) { return n < 10 ? '0' + n : n; }
+    return d.getFullYear() + '-' + p(d.getMonth() + 1) + '-' + p(d.getDate()) + ' ' + p(d.getHours()) + ':' + p(d.getMinutes());
+  }
+
+  function load(meta) {
+    $('snap-url').textContent = meta.url;
+    $('snap-time').textContent = fmtTime(meta.created_at);
+    $('frame').src = '/api/v1/snapshot/' + encodeURIComponent(id);
+    document.title = meta.url + ' · Magic Browser 快照';
+    show('view');
+  }
+
+  // 探针：meta 端点 401=需密码，404=快照不存在，200=放行。
+  function probe() {
+    fetch('/api/v1/history/' + encodeURIComponent(id) + '/meta').then(function (r) {
+      if (r.status === 401) { show('gate'); return; }
+      if (r.status === 404) { show('missing'); return; }
+      if (!r.ok) { show('missing'); return; }
+      return r.json().then(load);
+    }).catch(function () { show('missing'); });
+  }
+
+  // 无密码门时直接探测；有门时 401 会落到 gate。
+  probe();
+
+  $('gate-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    $('gate-error').classList.add('hidden');
+    fetch('/api/v1/auth/site', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: $('gate-password').value })
+    }).then(function (r) {
+      if (r.ok) { probe(); }
+      else { $('gate-error').textContent = '访问密码不正确'; $('gate-error').classList.remove('hidden'); }
+    }).catch(function () {
+      $('gate-error').textContent = '网络错误';
+      $('gate-error').classList.remove('hidden');
+    });
+  });
+
+  // 快照内的深度交互 → 跳到主界面「从这里继续」（新会话以本页为种子）。
+  window.addEventListener('message', function (e) {
+    if (e.data && e.data.__magic === 'navigate') {
+      location.href = '/?resume=' + encodeURIComponent(id);
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>结算 · 未来商城</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 text-gray-900">
+<header class="bg-white border-b">
+  <div class="max-w-3xl mx-auto px-4 py-3 flex items-center gap-4">
+    <a href="/" class="text-xl font-bold text-indigo-600">🛍 未来商城</a>
+    <span class="text-sm text-gray-400">结算中心</span>
+  </div>
+</header>
+
+<main class="max-w-3xl mx-auto px-4 py-8">
+  <h1 class="text-xl font-bold mb-6">确认订单</h1>
+
+  <div class="bg-white rounded-2xl p-6 shadow flex items-center gap-5">
+    <div class="w-20 h-20 rounded-xl bg-gradient-to-br from-sky-400 to-blue-600 flex items-center justify-center text-4xl">⌚</div>
+    <div class="flex-1">
+      <div class="font-semibold">星环手表 Pro</div>
+      <div class="text-sm text-gray-500 mt-1" id="order-meta">—</div>
+    </div>
+    <div class="text-red-500 font-bold text-lg">¥1,999</div>
+  </div>
+
+  <form data-magic-form action="/order/confirm" class="mt-6 bg-white rounded-2xl p-6 shadow space-y-4">
+    <div>
+      <label class="text-sm font-semibold">收货地址</label>
+      <textarea name="address" rows="2" class="mt-1 w-full border rounded-xl px-3 py-2 text-sm" placeholder="省 / 市 / 区 / 详细地址"></textarea>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="text-sm font-semibold">收货人</label>
+        <input name="name" class="mt-1 w-full border rounded-xl px-3 py-2 text-sm" placeholder="姓名">
+      </div>
+      <div>
+        <label class="text-sm font-semibold">手机号</label>
+        <input name="phone" class="mt-1 w-full border rounded-xl px-3 py-2 text-sm" placeholder="11 位手机号">
+      </div>
+    </div>
+    <div>
+      <label class="text-sm font-semibold">支付方式</label>
+      <div class="mt-2 flex gap-3 text-sm">
+        <label class="flex items-center gap-2"><input type="radio" name="pay" value="drone" checked>🚁 无人机货到付款</label>
+        <label class="flex items-center gap-2"><input type="radio" name="pay" value="online">💳 在线支付</label>
+      </div>
+    </div>
+    <button type="submit" class="w-full bg-red-500 hover:bg-red-600 text-white font-bold py-3 rounded-xl">提交订单</button>
+  </form>
+</main>
+
+<footer class="border-t mt-12 py-6 text-center text-xs text-gray-400">
+  本页面由 Magic Browser 实时生成 · future-shop.magic
+</footer>
+
+<script>
+  // 把上一页表单带来的购买信息回显（真实场景由 LLM 依据上下文生成）。
+  document.getElementById('order-meta').textContent = '颜色：钛银 · 数量：1 · 预计 2049-09-05 无人机送达';
+</script>
+</body>
+</html>

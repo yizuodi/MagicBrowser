@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Magic Browser · 管理后台</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+:root { --accent: #6d5dfc; --text: #1f2329; --dim: #646a73; --line: #e2e4ea; }
+.hidden { display: none !important; }
+body { font-family: "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; background: #f5f6f8; color: var(--text); min-height: 100vh; }
+
+/* 登录卡 */
+#login { display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+.login-card { width: min(400px, 90vw); padding: 40px 36px; text-align: center; background: #fff; border-radius: 16px; box-shadow: 0 8px 30px rgba(0,0,0,.08); }
+.login-card h1 { font-size: 20px; margin-bottom: 4px; }
+.login-card p { font-size: 13px; color: var(--dim); margin-bottom: 24px; }
+#login input { width: 100%; padding: 12px 14px; font-size: 15px; border: 1px solid var(--line); border-radius: 10px; outline: none; }
+#login input:focus { border-color: var(--accent); }
+#login button { width: 100%; margin-top: 14px; padding: 12px; font-size: 15px; color: #fff; background: var(--accent); border: none; border-radius: 10px; cursor: pointer; }
+#login-error { margin-top: 10px; font-size: 13px; color: #e54d42; }
+
+/* 配置面板 */
+#panel { max-width: 860px; margin: 0 auto; padding: 32px 20px 60px; }
+.panel-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+.panel-head h1 { font-size: 22px; }
+.panel-head a { font-size: 13px; color: var(--dim); text-decoration: none; }
+.panel-head a:hover { color: var(--text); }
+.card { background: #fff; border-radius: 14px; padding: 24px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+.card h2 { font-size: 15px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+.field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.field label { font-size: 13px; font-weight: 600; }
+.field .hint { font-size: 12px; color: var(--dim); }
+.field input[type=text], .field input[type=password], .field input[type=number], .field textarea {
+  padding: 10px 12px; font-size: 14px; border: 1px solid var(--line); border-radius: 8px; outline: none; font-family: inherit;
+}
+.field input:focus, .field textarea:focus { border-color: var(--accent); }
+.field textarea { min-height: 140px; font-family: ui-monospace, monospace; font-size: 12.5px; line-height: 1.6; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; }
+.switch-row { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.switch-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--accent); }
+.save-bar { display: flex; gap: 12px; align-items: center; }
+.btn { padding: 10px 26px; font-size: 14px; border: none; border-radius: 8px; cursor: pointer; }
+.btn-primary { color: #fff; background: var(--accent); }
+.btn-plain { color: var(--text); background: #eef0f4; }
+#toast {
+  position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%) translateY(20px);
+  padding: 12px 24px; font-size: 14px; color: #fff; background: #2da641; border-radius: 999px;
+  opacity: 0; pointer-events: none; transition: all .25s;
+}
+#toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+#toast.err { background: #e54d42; }
+.gate-group { padding: 14px; background: #f8f9fb; border-radius: 10px; }
+
+/* 页面历史 */
+.hist-toolbar { display: flex; gap: 10px; margin-bottom: 14px; }
+.hist-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.hist-table th { text-align: left; padding: 8px 10px; color: var(--dim); font-weight: 600; border-bottom: 1px solid var(--line); }
+.hist-table td { padding: 9px 10px; border-bottom: 1px solid #f0f1f4; vertical-align: middle; }
+.hist-table td.url { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hist-table td.sess { color: var(--dim); font-family: ui-monospace, monospace; font-size: 12px; }
+.row-btn { margin-right: 8px; font-size: 12px; color: var(--accent); background: none; border: none; cursor: pointer; padding: 2px 4px; }
+.row-btn:hover { text-decoration: underline; }
+.row-btn.danger { color: #e54d42; }
+.hist-pager { display: flex; align-items: center; gap: 12px; justify-content: center; margin-top: 14px; font-size: 13px; color: var(--dim); }
+.hist-pager button { padding: 5px 14px; font-size: 12px; color: var(--text); background: #eef0f4; border: none; border-radius: 6px; cursor: pointer; }
+.hist-pager button:disabled { opacity: .4; cursor: default; }
+#hist-total { font-size: 12px; color: var(--dim); font-weight: 400; margin-left: 8px; }
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="login-card">
+    <h1>⚙ Magic Browser 管理后台</h1>
+    <p>请输入管理员密码</p>
+    <form id="login-form">
+      <input type="password" id="login-password" placeholder="管理员密码" autocomplete="current-password">
+      <button type="submit">登 录</button>
+      <p id="login-error"></p>
+    </form>
+  </div>
+</div>
+
+<div id="panel" class="hidden">
+  <div class="panel-head">
+    <h1>⚙ Magic Browser 管理后台</h1>
+    <div>
+      <a href="/" target="_blank">打开浏览器 →</a>
+      &nbsp;·&nbsp;
+      <a href="#" id="btn-logout">退出登录</a>
+    </div>
+  </div>
+
+  <form id="config-form">
+    <div class="card">
+      <h2>模型调用</h2>
+      <div class="field">
+        <label>API Endpoint（OpenAI 兼容根地址）</label>
+        <input type="text" id="f-provider" placeholder="https://api.groq.com/openai/v1">
+        <span class="hint">完整地址到 /v1 为止，系统会自动拼接 /chat/completions</span>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>API Key</label>
+          <input type="password" id="f-apikey" placeholder="">
+          <span class="hint" id="apikey-hint"></span>
+        </div>
+        <div class="field">
+          <label>模型名称</label>
+          <input type="text" id="f-model" placeholder="llama-3.3-70b-versatile">
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="field">
+          <label>生成超时（秒）</label>
+          <input type="number" id="f-timeout" min="10" max="600">
+        </div>
+        <div class="field">
+          <label>Tailwind CDN 地址（可选）</label>
+          <input type="text" id="f-cdn" placeholder="https://cdn.tailwindcss.com">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>前端体验</h2>
+      <div class="field">
+        <label>页面加载文案</label>
+        <input type="text" id="f-loading" placeholder="豆包正在为你加载页面中~">
+        <span class="hint">生成期间全屏遮罩展示的文案</span>
+      </div>
+      <div class="field">
+        <label>系统提示词</label>
+        <textarea id="f-sysprompt"></textarea>
+        <span class="hint">指导模型如何生成页面。约定：data-magic-nav=深度跳转标记，data-magic-form=提交跳转表单，data-magic-local=本地表单</span>
+      </div>
+      <div class="field">
+        <label>上下文压缩阈值（token）</label>
+        <input type="number" id="f-threshold" min="1000">
+        <span class="hint">会话累计 token 超过该值时自动压缩为状态摘要（默认 200000）</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>访问密码</h2>
+      <div class="gate-group">
+        <div class="switch-row">
+          <input type="checkbox" id="f-gate-on">
+          <label for="f-gate-on" style="margin:0">启用访客访问密码（打开网站需先输入密码）</label>
+        </div>
+        <div class="field" id="site-pw-field">
+          <label>访客密码</label>
+          <input type="password" id="f-sitepw" placeholder="留空 = 不修改">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>管理员密码</h2>
+      <div class="field">
+        <label>新管理员密码</label>
+        <input type="password" id="f-adminpw" placeholder="留空 = 不修改">
+        <span class="hint">修改后其他已登录的管理员会话在cookie过期前仍然有效</span>
+      </div>
+    </div>
+
+    <div class="save-bar">
+      <button type="submit" class="btn btn-primary">保存配置</button>
+      <button type="button" class="btn btn-plain" id="btn-reload-config">放弃修改并重载</button>
+    </div>
+  </form>
+
+  <div class="card">
+    <h2>页面历史<span id="hist-total"></span></h2>
+    <div class="hist-toolbar">
+      <button type="button" class="btn btn-plain" id="btn-hist-refresh">刷新</button>
+      <button type="button" class="btn btn-plain" id="btn-hist-clear">清空全部</button>
+    </div>
+    <table class="hist-table">
+      <thead>
+        <tr><th style="width:130px">时间</th><th>网址</th><th style="width:120px">会话</th><th style="width:80px">大小</th><th style="width:190px">操作</th></tr>
+      </thead>
+      <tbody id="hist-body">
+        <tr><td colspan="5" style="color:var(--dim)">加载中…</td></tr>
+      </tbody>
+    </table>
+    <div class="hist-pager">
+      <button type="button" id="hist-prev">上一页</button>
+      <span id="hist-page"></span>
+      <button type="button" id="hist-next">下一页</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script src="/admin.js"></script>
+</body>
+</html>
