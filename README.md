@@ -1,5 +1,7 @@
 # Magic Browser ✨
 
+[![CI](https://github.com/yizuodi/MagicBrowser/actions/workflows/ci.yml/badge.svg)](https://github.com/yizuodi/MagicBrowser/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/yizuodi/MagicBrowser?logo=github)](https://github.com/yizuodi/MagicBrowser/releases)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Go Version](https://img.shields.io/badge/Go-%3E%3D%201.22-00ADD8?logo=go)](go.mod)
 
@@ -87,6 +89,11 @@ session.Store ──────────── llm.Client ──► OpenAI �
 ```bash
 go test -race ./...   # 全部单元测试（SSE 解析/围栏剥离/会话/配置/鉴权/路由）
 ```
+
+## CI/CD 与版本发布
+
+- **持续集成（CI）**：每次向 `main` 分支提交代码或提交 PR 时，GitHub Actions 会自动触发跨 Go 版本（1.22 / 1.23）测试与跨平台（Linux / macOS / Windows）编译验证。
+- **自动 Release**：当向仓库推送带 `v` 前缀的版本标签（如 `git tag v1.0.0 && git push origin v1.0.0`）时，Actions 流水线会自动完成 6 大主流平台（Linux amd64/arm64、macOS amd64/arm64、Windows amd64/arm64）的静态二进制打包（含 SHA256 校验和）并创建 GitHub Release。
 
 ## 安全说明
 

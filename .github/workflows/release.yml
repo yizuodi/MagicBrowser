@@ -1,0 +1,111 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-release:
+    name: Build & Package (${{ matrix.goos }}-${{ matrix.goarch }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goos: linux
+            goarch: amd64
+            archive: tar.gz
+          - goos: linux
+            goarch: arm64
+            archive: tar.gz
+          - goos: darwin
+            goarch: amd64
+            archive: tar.gz
+          - goos: darwin
+            goarch: arm64
+            archive: tar.gz
+          - goos: windows
+            goarch: amd64
+            archive: zip
+          - goos: windows
+            goarch: arm64
+            archive: zip
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Build & Package
+        env:
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
+          CGO_ENABLED: '0'
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          PKG_NAME="magic-browser-${TAG_NAME}-${{ matrix.goos }}-${{ matrix.goarch }}"
+          TARGET_DIR="dist/${PKG_NAME}"
+          mkdir -p "${TARGET_DIR}"
+
+          BIN_EXT=""
+          if [ "${{ matrix.goos }}" = "windows" ]; then
+            BIN_EXT=".exe"
+          fi
+
+          # Build static binaries with stripped debug symbols
+          go build -ldflags="-s -w" -o "${TARGET_DIR}/magic-browser${BIN_EXT}" ./cmd/magic-browser
+          go build -ldflags="-s -w" -o "${TARGET_DIR}/mockllm${BIN_EXT}" ./cmd/mockllm
+
+          # Copy docs and licenses
+          cp README.md LICENSE "${TARGET_DIR}/"
+
+          # Package into zip or tar.gz
+          mkdir -p release-assets
+          cd dist
+          if [ "${{ matrix.archive }}" = "zip" ]; then
+            zip -r "../release-assets/${PKG_NAME}.zip" "${PKG_NAME}"
+          else
+            tar -czvf "../release-assets/${PKG_NAME}.tar.gz" "${PKG_NAME}"
+          fi
+          cd ..
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: assets-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: release-assets/*
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: build-release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all built artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Generate Checksums
+        working-directory: release-assets
+        run: |
+          sha256sum * > checksums.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
